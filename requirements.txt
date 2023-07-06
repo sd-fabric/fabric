@@ -1,7 +1,7 @@
 accelerate==0.18.0
-diffusers==0.14.0
+diffusers==0.17.1
 torch==2.0.1
-transformers>=4.27.1
+transformers>=4.30.2
 hydra-core
 matplotlib
 pandas

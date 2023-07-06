@@ -1,0 +1,23 @@
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fabric"
+description = "FABRIC: Personalizing Diffusion Models with Iterative Feedback"
+authors = [
+    { name = "Elisabetta Fedele" },
+    { name = "Lukas Wolf" },
+    { name = "Jonathan Thomm" },
+    { name = "Dimitri von Rütte" }
+]
+readme = "README.md"
+urls = {github = "https://github.com/sd-fabric/fabric"}
+dynamic = ["version"]
+
+[tool.setuptools]
+packages = ["fabric"]
+
+[tool.setuptools.dynamic]
+version = {attr = "fabric.__version__"}

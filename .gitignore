@@ -1,0 +1,14 @@
+__pycache__
+.venv
+*.egg-info
+.DS_Store
+weights
+*.err
+*.out
+*tmp*
+
+# Generated images and logs
+outputs
+
+# vscode files
+.vscode

@@ -1,0 +1,12 @@
+accelerate==0.18.0
+diffusers==0.14.0
+torch==2.0.1
+transformers>=4.27.1
+hydra-core
+matplotlib
+pandas
+tqdm
+Pillow
+ftfy
+regex
+clip @ git+https://github.com/openai/CLIP.git

@@ -8,11 +8,11 @@ denoising_steps: 20
 guidance_scale: 6
 prompt_dropout: 0.0
 feedback:
-    start: 0.0
-    end: 1.0
-    min_weight: 0.1
-    max_weight: 0.8
-    neg_scale: 0.5
+  start: 0.0
+  end: 1.0
+  min_weight: 0.1
+  max_weight: 0.8
+  neg_scale: 0.5
 global_seed: 0
 image_seed: null
 liked_images: []

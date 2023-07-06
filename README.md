@@ -1,6 +1,6 @@
 # FABRIC: Personalizing Diffusion Models with Iterative Feedback
 
-[[Paper (coming soon)]]() [[Website (coming soon)]]() [[Colab (coming soon)]]()
+[Paper (coming soon)]() | [Website (coming soon)]() | [Colab (coming soon)]()
 
 FABRIC (Feedback via Attention-Based Reference Image Conditioning) is a technique to incorporate iterative feedback into the generative process of diffusion models based on StableDiffusion.
 This is done by exploiting the self-attention mechanism in the U-Net in order to condition the diffusion process on a set of positive and negative reference images that are to be chosen based on human feedback.
@@ -8,7 +8,7 @@ This is done by exploiting the self-attention mechanism in the U-Net in order to
 
 ## Setup
 
-Create virtual environment:
+Create virtual environment and install the required packages as follows:
 ```bash
 python3 -m venv .venv  # create new virtual environment
 source .venv/bin/activate  # activate it

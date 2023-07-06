@@ -119,8 +119,8 @@ def attn_with_weights(
 class AttentionBasedGenerator(nn.Module):
     def __init__(
         self,
-        model_ckpt: Optional[str] = None,
         model_name: Optional[str] = None,
+        model_ckpt: Optional[str] = None,
         stable_diffusion_version: str = "1.5",
         lora_weights: Optional[str] = None,
         torch_dtype=torch.float32,

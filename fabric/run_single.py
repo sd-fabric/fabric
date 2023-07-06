@@ -29,8 +29,8 @@ def main(ctx: DictConfig):
     imgs = generator.generate(
         prompt=ctx.prompt,
         negative_prompt=ctx.negative_prompt,
-        liked=list(ctx.liked_images) if ctx.liked_images else [],
-        disliked=list(ctx.disliked_images) if ctx.disliked_images else [],
+        liked=list(ctx.liked) if ctx.liked else [],
+        disliked=list(ctx.disliked) if ctx.disliked else [],
         seed=ctx.seed,
         n_images=ctx.n_images,
         guidance_scale=ctx.guidance_scale,

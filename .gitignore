@@ -12,3 +12,6 @@ outputs
 
 # vscode files
 .vscode
+
+# scripts 
+run_preference_model.sh

@@ -42,6 +42,7 @@ def main(ctx: DictConfig):
         stable_diffusion_version=ctx.model_version,
         lora_weights=ctx.lora_weights if hasattr(ctx, "lora_weights") else None,
         torch_dtype=dtype,
+        device=device
     ).to(device)
 
     generator = IterativeFeedbackGenerator(

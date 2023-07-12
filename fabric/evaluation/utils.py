@@ -4,13 +4,16 @@ from datetime import date
 
 from PIL import Image
 
+
 def make_out_folder(output_path: str = "outputs"):
     date_str = date.today().strftime("%Y-%m-%d")
     out_folder = os.path.join(output_path, date_str)
-    experiment_paths = sorted(glob.glob(os.path.join(out_folder, 'experiment_*')))
+    experiment_paths = sorted(glob.glob(os.path.join(out_folder, "experiment_*")))
     n_experiment = len(experiment_paths)
     out_folder = os.path.join(out_folder, "experiment_" + str(n_experiment))
     os.makedirs(out_folder, exist_ok=True)
+    return out_folder
+
 
 def get_prompts(path_to_dir):
     num_prompts = len(glob.glob(os.path.join(path_to_dir, "*.txt")))
@@ -20,6 +23,7 @@ def get_prompts(path_to_dir):
             prompt = f.read()
         prompts.append(prompt)
     return prompts
+
 
 def get_images(path_to_dir):
     num_images = len(glob.glob(os.path.join(path_to_dir, "*.jpg")))

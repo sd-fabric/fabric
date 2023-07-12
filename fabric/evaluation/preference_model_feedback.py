@@ -103,7 +103,7 @@ def main(ctx: DictConfig):
                 disliked_idx = np.argmin(pref_scores)
                 generator.give_feedback([imgs[liked_idx]], [imgs[disliked_idx]])
 
-                liked, disliked = generator.get_feedback()
+                liked, disliked = generator.give_feedback()
                 if len(liked) > 0:
                     pos_sims = img_similarity_model.compute(imgs, liked)
                     pos_sims = np.mean(pos_sims, axis=1)

@@ -18,14 +18,16 @@ from fabric.metrics.pick_score import PickScore
 from fabric.evaluation.utils import make_out_folder
 
 
-@hydra.main(config_path="../configs", config_name="preference_model_feedback", version_base=None)
+@hydra.main(
+    config_path="../configs", config_name="preference_model_feedback", version_base=None
+)
 def main(ctx: DictConfig):
     # set global torch seed
     if ctx.global_seed is not None:
         torch.manual_seed(ctx.global_seed)
         np.random.seed(ctx.global_seed)
 
-    device = "cpu"  # "mps" if torch.backends.mps.is_available() else "cpu"
+    device = "mps" if torch.backends.mps.is_available() else "cpu"
     device = get_free_gpu() if torch.cuda.is_available() else device
     print(f"Using device: {device}")
 
@@ -40,6 +42,11 @@ def main(ctx: DictConfig):
         torch_dtype=dtype,
     ).to(device)
 
+    init_liked_paths = list(ctx.liked_images) if ctx.liked_images else []
+    init_disliked_paths = list(ctx.disliked_images) if ctx.disliked_images else []
+    init_liked = [Image.open(img_path) for img_path in init_liked_paths]
+    init_disliked = [Image.open(img_path) for img_path in init_disliked_paths]
+
     generator = IterativeFeedbackGenerator(
         base_generator,
         init_liked=init_liked,
@@ -50,10 +57,12 @@ def main(ctx: DictConfig):
     negative_prompt = ctx.negative_prompt if hasattr(ctx, "negative_prompt") else ""
     if ctx.lora_weights and "hps_lora" in ctx.lora_weights:
         if not negative_prompt.startswith("Weird image. "):
-            print("Using HPS LoRA but 'Weird image. ' was not in negative prompt. Adding it.")
+            print(
+                "Using HPS LoRA but 'Weird image. ' was not in negative prompt. Adding it."
+            )
             negative_prompt = "Weird image. " + negative_prompt
 
-    out_folder = make_out_folder(ctx.out_path)
+    out_folder = make_out_folder(ctx.output_path)
 
     if ctx.sample_prompt:
         prompts = sample_prompts(max_num_prompts=ctx.num_prompts, seed=0)
@@ -63,11 +72,6 @@ def main(ctx: DictConfig):
     pref_model = PickScore(device=device)
     img_similarity_model = ImageSimilarity(device=device)
     img_diversity_model = ImageDiversity(device=device)
-
-    init_liked_paths = list(ctx.liked_images) if ctx.liked_images else []
-    init_disliked_paths = list(ctx.disliked_images) if ctx.disliked_images else []
-    init_liked = [Image.open(img_path) for img_path in init_liked_paths]
-    init_disliked = [Image.open(img_path) for img_path in init_disliked_paths]
 
     metrics = []
     with torch.inference_mode():
@@ -93,13 +97,13 @@ def main(ctx: DictConfig):
                     neg_scale=ctx.feedback.neg_scale,
                     return_params=True,
                 )
-                
+
                 pref_scores = pref_model.compute(prompt, imgs)
                 liked_idx = np.argmax(pref_scores)
                 disliked_idx = np.argmin(pref_scores)
                 generator.give_feedback([imgs[liked_idx]], [imgs[disliked_idx]])
 
-                liked, disliked = generator.get_feedback()
+                liked, disliked = generator.give_feedback()
                 if len(liked) > 0:
                     pos_sims = img_similarity_model.compute(imgs, liked)
                     pos_sims = np.mean(pos_sims, axis=1)

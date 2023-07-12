@@ -38,7 +38,7 @@ class IterativeFeedbackGenerator:
         **kwargs,
     ):
         if seed is None:
-            seed = torch.randint(0, 2 ** 32, (1,)).item()
+            seed = torch.randint(0, 2**32, (1,)).item()
 
         ps = [prompt] * n_images
         if prompt_dropout > 0:
@@ -52,7 +52,7 @@ class IterativeFeedbackGenerator:
             n_images=n_images,
             **kwargs,
         )
-        
+
         if return_params:
             curr_round = self.round
             self.round += 1
@@ -74,3 +74,4 @@ class IterativeFeedbackGenerator:
     ):
         self.liked.extend(liked)
         self.disliked.extend(disliked)
+        return self.liked.copy(), self.disliked.copy()

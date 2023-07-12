@@ -10,5 +10,11 @@ weights
 # Generated images and logs
 outputs
 
+# LoRA files
+resources/hps_lora/*
+
 # vscode files
 .vscode
+
+# scripts 
+run_preference_model.sh

@@ -123,8 +123,7 @@ class AttentionBasedGenerator(nn.Module):
         model_ckpt: Optional[str] = None,
         stable_diffusion_version: str = "1.5",
         lora_weights: Optional[str] = None,
-        torch_dtype=torch.float32,
-        device: Optional[str] = "cpu"
+        torch_dtype=torch.float32
     ):
         super().__init__()
 

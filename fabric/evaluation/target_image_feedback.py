@@ -145,8 +145,10 @@ def main(ctx: DictConfig):
                     tiled.save(tiled_path)
                     print(f"Saved tile to {tiled_path}")
 
-                liked_paths.append(out_paths[liked_idx])
-                disliked_paths.append(out_paths[disliked_idx])
+                if ctx.use_pos_feedback:
+                    liked_paths.append(out_paths[liked_idx])
+                if ctx.use_neg_feedback:
+                    disliked_paths.append(out_paths[disliked_idx])
 
                 print(f"Similarities to target image: {img_sim_scores}")
                 print(f"Preference scores: {pref_scores}")

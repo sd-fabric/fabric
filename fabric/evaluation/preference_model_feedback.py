@@ -140,8 +140,8 @@ def main(ctx: DictConfig):
                             "pos_sim": pos_sim,
                             "neg_sim": neg_sim,
                             "seed": params["seed"],
-                            "liked": liked_paths,
-                            "disliked": disliked_paths,
+                            "liked": liked_paths.copy(),
+                            "disliked": disliked_paths.copy(),
                         }
                     )
                 if len(imgs) > 1:

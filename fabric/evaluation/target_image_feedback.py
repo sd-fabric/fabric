@@ -7,6 +7,7 @@ import tqdm
 import numpy as np
 from PIL import Image
 from omegaconf import DictConfig
+from hydra.utils import to_absolute_path
 
 from fabric.generator import AttentionBasedGenerator
 from fabric.iterative import IterativeFeedbackGenerator
@@ -33,8 +34,8 @@ def main(ctx: DictConfig):
     
     init_liked_paths = list(ctx.liked_images) if ctx.liked_images else []
     init_disliked_paths = list(ctx.disliked_images) if ctx.disliked_images else []
-    init_liked = [Image.open(img_path) for img_path in init_liked_paths]
-    init_disliked = [Image.open(img_path) for img_path in init_disliked_paths]
+    init_liked = [Image.open(to_absolute_path(img_path)) for img_path in init_liked_paths]
+    init_disliked = [Image.open(to_absolute_path(img_path)) for img_path in init_disliked_paths]
 
     base_generator = AttentionBasedGenerator(
         model_ckpt=ctx.model_ckpt if hasattr(ctx, "model_ckpt") else None,
@@ -50,9 +51,10 @@ def main(ctx: DictConfig):
         init_disliked=init_disliked,
     )
     
-    out_folder = make_out_folder(ctx.output_path)
+    out_folder = ctx.output_path if hasattr(ctx, "output_path") else make_out_folder()
+    os.makedirs(out_folder, exist_ok=True)
     
-    prompts, images = get_prompt_image_pairs(ctx.prompthero_path)
+    prompts, images = get_prompt_image_pairs(to_absolute_path(ctx.prompthero_path))
     print(f"Found {len(prompts)} prompts and {len(images)} images")
     
     pref_model = PickScore(device=device)
@@ -156,8 +158,8 @@ def main(ctx: DictConfig):
                 print(f"Pos. similarities: {pos_sims}")
                 print(f"Neg. similarities: {neg_sims}")
 
-            pd.DataFrame(metrics).to_csv(os.path.join(out_folder, "metrics.csv"), index=False)
-            print(f"Saved metrics to {out_folder}/metrics.csv")
+            pd.DataFrame(metrics).to_csv("metrics.csv", index=False)
+            print(f"Saved metrics to {to_absolute_path('.')}/metrics.csv")
 
 
 if __name__ == "__main__":

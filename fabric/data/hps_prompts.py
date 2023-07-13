@@ -4,6 +4,9 @@ import random
 import re
 from typing import Optional
 
+from hydra.utils import to_absolute_path
+
+
 def sample_prompts(
     max_num_prompts=-1,
     dataset_path="resources/hps_dataset",
@@ -25,6 +28,8 @@ def sample_prompts(
     Returns:
         list: List of sampled prompts.
     """
+    dataset_path = to_absolute_path(dataset_path)
+
     assert split in ["train", "test"]
     if split == "train":
         file_path = os.path.join(dataset_path, train_file)

@@ -7,6 +7,7 @@ import tqdm
 import numpy as np
 from PIL import Image
 from omegaconf import DictConfig
+from hydra.utils import to_absolute_path
 
 from fabric.generator import AttentionBasedGenerator
 from fabric.iterative import IterativeFeedbackGenerator
@@ -44,8 +45,8 @@ def main(ctx: DictConfig):
 
     init_liked_paths = list(ctx.liked_images) if ctx.liked_images else []
     init_disliked_paths = list(ctx.disliked_images) if ctx.disliked_images else []
-    init_liked = [Image.open(img_path) for img_path in init_liked_paths]
-    init_disliked = [Image.open(img_path) for img_path in init_disliked_paths]
+    init_liked = [Image.open(to_absolute_path(img_path)) for img_path in init_liked_paths]
+    init_disliked = [Image.open(to_absolute_path(img_path)) for img_path in init_disliked_paths]
 
     generator = IterativeFeedbackGenerator(
         base_generator,
@@ -62,7 +63,8 @@ def main(ctx: DictConfig):
             )
             negative_prompt = "Weird image. " + negative_prompt
 
-    out_folder = make_out_folder(ctx.output_path)
+    out_folder = ctx.output_path if hasattr(ctx, "output_path") else make_out_folder()
+    os.makedirs(out_folder, exist_ok=True)
 
     if ctx.sample_prompt:
         prompts = sample_prompts(max_num_prompts=ctx.num_prompts, seed=0)
@@ -103,7 +105,7 @@ def main(ctx: DictConfig):
                 disliked_idx = np.argmin(pref_scores)
                 generator.give_feedback([imgs[liked_idx]], [imgs[disliked_idx]])
 
-                liked, disliked = generator.get_feedback()
+                liked, disliked = generator.give_feedback()
                 if len(liked) > 0:
                     pos_sims = img_similarity_model.compute(imgs, liked)
                     pos_sims = np.mean(pos_sims, axis=1)
@@ -140,8 +142,8 @@ def main(ctx: DictConfig):
                             "pos_sim": pos_sim,
                             "neg_sim": neg_sim,
                             "seed": params["seed"],
-                            "liked": liked_paths,
-                            "disliked": disliked_paths,
+                            "liked": liked_paths.copy(),
+                            "disliked": disliked_paths.copy(),
                         }
                     )
                 if len(imgs) > 1:
@@ -152,18 +154,18 @@ def main(ctx: DictConfig):
                     tiled.save(tiled_path)
                     print(f"Saved tile to {tiled_path}")
 
-                liked_paths.append(out_paths[liked_idx])
-                disliked_paths.append(out_paths[disliked_idx])
+                if ctx.use_pos_feedback:
+                    liked_paths.append(out_paths[liked_idx])
+                if ctx.use_neg_feedback:
+                    disliked_paths.append(out_paths[disliked_idx])
 
                 print(f"Preference scores: {pref_scores}")
                 print(f"Round diversity: {round_diversity}")
                 print(f"Pos. similarities: {pos_sims}")
                 print(f"Neg. similarities: {neg_sims}")
 
-            pd.DataFrame(metrics).to_csv(
-                os.path.join(out_folder, "metrics.csv"), index=False
-            )
-            print(f"Saved metrics to {out_folder}/metrics.csv")
+            pd.DataFrame(metrics).to_csv("metrics.csv", index=False)
+            print(f"Saved metrics to {to_absolute_path('.')}/metrics.csv")
 
 
 if __name__ == "__main__":

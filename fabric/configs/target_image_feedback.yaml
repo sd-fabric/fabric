@@ -1,3 +1,10 @@
+# configure hydra to change the working directory
+hydra:
+  run:
+    dir: outputs/${hydra.job.config_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: true
+
 model_version: "1.5"
 model_name: dreamlike-art/dreamlike-photoreal-2.0
 negative_prompt: lowres, bad anatomy, bad hands, cropped, worst quality
@@ -7,6 +14,8 @@ num_prompts: 1000
 denoising_steps: 20
 guidance_scale: 6
 prompt_dropout: 0.0
+use_pos_feedback: yes
+use_neg_feedback: yes
 feedback:
   start: 0.0
   end: 1.0
@@ -18,7 +27,7 @@ image_seed: null
 liked_images: []
 disliked_images: []
 prompthero_path: resources/prompthero
-output_path: outputs/target_image_feedback
+output_path: images
 
 # For loading the Human Preference Score LoRA weights, set null to not use them
 lora_weights: null  # fabric/resources/hps_lora/adapted_model.bin

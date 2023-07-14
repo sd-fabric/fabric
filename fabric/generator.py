@@ -123,7 +123,7 @@ class AttentionBasedGenerator(nn.Module):
         model_ckpt: Optional[str] = None,
         stable_diffusion_version: str = "1.5",
         lora_weights: Optional[str] = None,
-        torch_dtype=torch.float32,
+        torch_dtype=torch.float32
     ):
         super().__init__()
 
@@ -161,7 +161,7 @@ class AttentionBasedGenerator(nn.Module):
         if lora_weights:
             print(f"Applying LoRA weights from {lora_weights}")
             apply_unet_lora_weights(
-                pipeline=pipe, unet_path=lora_weights, device=device
+                pipeline=pipe, unet_path=lora_weights
             )
 
         self.pipeline = pipe

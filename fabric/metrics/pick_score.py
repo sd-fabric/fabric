@@ -14,10 +14,10 @@ class PickScore:
         model_pretrained_name_or_path: str = "yuvalkirstain/PickScore_v1",
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
     ):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = device
         self.processor = AutoProcessor.from_pretrained(processor_name_or_path)
         self.model = (
-            AutoModel.from_pretrained(model_pretrained_name_or_path).eval().to(device)
+             AutoModel.from_pretrained(model_pretrained_name_or_path).eval().to(device)
         )
         self.device = device
 

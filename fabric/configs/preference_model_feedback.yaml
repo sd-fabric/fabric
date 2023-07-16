@@ -12,8 +12,9 @@ sample_prompt: yes
 n_images: 4
 n_rounds: 3
 num_prompts: 1000
-guidance_scale: 6
 denoising_steps: 20
+guidance_scale: 6
+prompt_drouput: 0.0
 use_pos_feedback: yes
 use_neg_feedback: yes
 feedback:

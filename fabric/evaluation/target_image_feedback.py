@@ -82,6 +82,7 @@ def main(ctx: DictConfig):
                 imgs, params = generator.generate(
                     prompt=prompt,
                     negative_prompt=negative_prompt,
+                    prompt_dropout=ctx.prompt_dropout,
                     seed=ctx.image_seed,
                     n_images=ctx.n_images,
                     denoising_steps=ctx.denoising_steps,

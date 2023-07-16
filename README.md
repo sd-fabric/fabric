@@ -11,7 +11,14 @@ This is done by exploiting the self-attention mechanism in the U-Net in order to
 
 ## Setup
 
-Create virtual environment and install the required packages as follows:
+- Option 1:
+Install the repository as a pip-package (does not install dependencies, check `requirements.txt` for required dependencies):
+```bash
+pip install git+https://github.com/sd-fabric/fabric.git
+```
+
+- Option 2:
+Clone the repository, create virtual environment and install the required packages as follows:
 ```bash
 python3 -m venv .venv  # create new virtual environment
 source .venv/bin/activate  # activate it

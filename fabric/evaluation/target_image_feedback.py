@@ -1,3 +1,4 @@
+import functools
 import os
 
 import hydra
@@ -11,12 +12,17 @@ from hydra.utils import to_absolute_path
 
 from fabric.generator import AttentionBasedGenerator
 from fabric.iterative import IterativeFeedbackGenerator
-from fabric.utils import get_free_gpu, tile_images
+from fabric.utils import get_free_gpu
 from fabric.metrics.image_similarity import ImageSimilarity
 from fabric.metrics.image_diversity import ImageDiversity
 from fabric.metrics.pick_score import PickScore
-from fabric.evaluation.utils import make_out_folder
+from fabric.evaluation.utils import make_out_folder, generate_rounds_with_automatic_feedback
 from fabric.data.prompthero import get_prompt_image_pairs
+
+
+
+def feedback_scores(imgs, ref_image, model):
+    return model.compute([ref_image], imgs)[0]
 
 
 @hydra.main(config_path="../configs", config_name="target_image_feedback", version_base=None)
@@ -57,7 +63,6 @@ def main(ctx: DictConfig):
     prompts, images = get_prompt_image_pairs(to_absolute_path(ctx.prompthero_path))
     print(f"Found {len(prompts)} prompts and {len(images)} images")
     
-    pref_model = PickScore(device=device)
     img_similarity_model = ImageSimilarity(device=device)
     img_diversity_model = ImageDiversity(device=device)
 
@@ -74,93 +79,28 @@ def main(ctx: DictConfig):
             print(f"Prompt {idx + 1}/{len(prompts)}: {prompt}")
             
             reference_image = images[idx]
-            liked_paths = init_liked_paths.copy()
-            disliked_paths = init_disliked_paths.copy()
             generator.reset()
 
-            for i in range(ctx.n_rounds):
-                imgs, params = generator.generate(
-                    prompt=prompt,
-                    negative_prompt=negative_prompt,
-                    prompt_dropout=ctx.prompt_dropout,
-                    seed=ctx.image_seed,
-                    n_images=ctx.n_images,
-                    denoising_steps=ctx.denoising_steps,
-                    guidance_scale=ctx.guidance_scale,
-                    feedback_start=ctx.feedback.start,
-                    feedback_end=ctx.feedback.end,
-                    min_weight=ctx.feedback.min_weight,
-                    max_weight=ctx.feedback.max_weight,
-                    neg_scale=ctx.feedback.neg_scale,
-                    return_params=True,
-                )
-                
-                img_sim_scores = img_similarity_model.compute([reference_image], imgs)[0]
-                liked_idx = np.argmax(img_sim_scores)
-                disliked_idx = np.argmin(img_sim_scores)
-                generator.give_feedback([imgs[liked_idx]], [imgs[disliked_idx]])
+            feedback_fn = functools.partial(feedback_scores, ref_image=reference_image, model=img_similarity_model)
 
-                liked, disliked = params["liked"], params["disliked"]
-                if len(liked) > 0:
-                    pos_sims = img_similarity_model.compute(imgs, liked)
-                    pos_sims = np.mean(pos_sims, axis=1)
-                else:
-                    pos_sims = [None] * len(imgs)
-                
-                if len(disliked) > 0:
-                    neg_sims = img_similarity_model.compute(imgs, disliked)
-                    neg_sims = np.mean(neg_sims, axis=1)
-                else:
-                    neg_sims = [None] * len(imgs)
-                    
-                pref_scores = pref_model.compute(prompt, imgs)                
-                
-                round_diversity = img_diversity_model.compute(imgs)
-
-                out_paths = []
-                for j, (p, img, pref_score, target_img_sim, pos_sim, neg_sim) in enumerate(
-                    zip(params["prompts"], imgs, pref_scores, img_sim_scores, pos_sims, neg_sims)
-                ):
-                    out_path = os.path.join(out_folder, f"prompt_{idx}_round_{i}_image_{j}.png")
-                    out_paths.append(out_path)
-                    img.save(out_path)
-                    print(f"Saved image to {out_path}")
-
-                    metrics.append({
-                        "round": i,
-                        "prompt": p,
-                        "prompt_idx": idx,
-                        "image_idx": j,
-                        "image": out_path,
-                        "pref_score": pref_score,
-                        "target_img_sim": target_img_sim,
-                        "round_diversity": round_diversity,
-                        "pos_sim": pos_sim,
-                        "neg_sim": neg_sim,
-                        "seed": params["seed"],
-                        "liked": liked_paths.copy(),
-                        "disliked": disliked_paths.copy(),
-                    })
-
-                if len(imgs) > 1:
-                    tiled = tile_images(imgs)
-                    tiled_path = os.path.join(out_folder, f"prompt_{idx}_tiled_round_{i}.png")
-                    tiled.save(tiled_path)
-                    print(f"Saved tile to {tiled_path}")
-
-                if ctx.use_pos_feedback:
-                    liked_paths.append(out_paths[liked_idx])
-                if ctx.use_neg_feedback:
-                    disliked_paths.append(out_paths[disliked_idx])
-
-                print(f"Similarities to target image: {img_sim_scores}")
-                print(f"Preference scores: {pref_scores}")
-                print(f"In-batch similarity: {round_diversity}")
-                print(f"Pos. similarities: {pos_sims}")
-                print(f"Neg. similarities: {neg_sims}")
-
+            ms = generate_rounds_with_automatic_feedback(
+                ctx,
+                generator, 
+                prompt_idx=idx,
+                prompt=prompt, 
+                neg_prompt=negative_prompt, 
+                feedback_fn=feedback_fn, 
+                out_folder=out_folder,
+                img_similarity_model=img_similarity_model, 
+                img_diversity_model=img_diversity_model, 
+                init_liked_paths=[],
+                init_disliked_paths=[],
+                feedback_key="target_img_sim",
+            )
+            metrics.extend(ms)
+            
             pd.DataFrame(metrics).to_csv("metrics.csv", index=False)
-            print(f"Saved metrics to {to_absolute_path('.')}/metrics.csv")
+            print(f"Saved metrics to {os.path.abspath('.')}/metrics.csv")
 
 
 if __name__ == "__main__":

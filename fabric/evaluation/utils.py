@@ -100,11 +100,12 @@ def generate_rounds_with_automatic_feedback(
 
             metrics.append({
                 "round": i,
-                "prompt": p,
                 "prompt_idx": prompt_idx,
                 "image_idx": j,
-                "image": out_path,
                 feedback_key: score,
+                "prompt": p,
+                "neg_prompt": neg_prompt,
+                "image": out_path,
                 "round_diversity": round_diversity,
                 "pos_sim": pos_sim,
                 "neg_sim": neg_sim,
@@ -128,7 +129,9 @@ def generate_rounds_with_automatic_feedback(
             generator.give_feedback([], [imgs[disliked_idx]])
             disliked_paths.append(out_paths[disliked_idx])
 
-        print(f"{feedback_scores}: {feedback_scores}")
+        print(f"{feedback_key}: {feedback_scores}")
         print(f"In-batch similarity: {round_diversity}")
         print(f"Pos. similarities: {pos_sims}")
         print(f"Neg. similarities: {neg_sims}")
+
+    return metrics

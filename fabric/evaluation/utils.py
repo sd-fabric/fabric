@@ -120,14 +120,15 @@ def generate_rounds_with_automatic_feedback(
             tiled.save(tiled_path)
             print(f"Saved tile to {tiled_path}")
 
+        liked_idx = np.argmax(feedback_scores)
+        liked_paths.append(out_paths[liked_idx])
         if ctx.use_pos_feedback:
-            liked_idx = np.argmax(feedback_scores)
             generator.give_feedback([imgs[liked_idx]], [])
-            liked_paths.append(out_paths[liked_idx])
+
+        disliked_idx = np.argmin(feedback_scores)
+        disliked_paths.append(out_paths[disliked_idx])
         if ctx.use_neg_feedback:
-            disliked_idx = np.argmin(feedback_scores)
             generator.give_feedback([], [imgs[disliked_idx]])
-            disliked_paths.append(out_paths[disliked_idx])
 
         print(f"{feedback_key}: {feedback_scores}")
         print(f"In-batch similarity: {round_diversity}")

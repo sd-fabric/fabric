@@ -37,6 +37,7 @@ def get_images(path_to_dir):
         images.append(image)
     return images
 
+
 @torch.no_grad()
 def generate_rounds_with_automatic_feedback(
     ctx,

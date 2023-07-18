@@ -47,7 +47,7 @@ def main(ctx: DictConfig):
         model_ckpt=ctx.model_ckpt if hasattr(ctx, "model_ckpt") else None,
         model_name=ctx.model_name if hasattr(ctx, "model_name") else None,
         stable_diffusion_version=ctx.model_version,
-        lora_weights=ctx.lora_weights if hasattr(ctx, "lora_weights") else None,
+        lora_weights=to_absolute_path(ctx.lora_weights) if hasattr(ctx, "lora_weights") else None,
         torch_dtype=dtype
     ).to(device)
 

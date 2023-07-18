@@ -14,7 +14,7 @@ n_rounds: 3
 num_prompts: 1000
 denoising_steps: 20
 guidance_scale: 6
-prompt_drouput: 0.0
+prompt_dropout: 0.0
 use_pos_feedback: yes
 use_neg_feedback: yes
 feedback:
@@ -30,4 +30,4 @@ disliked_images: []
 output_path: images
 
 # For loading the Human Preference Score LoRA weights, set null to not use them
-lora_weights: null  # fabric/resources/hps_lora/adapted_model.bin
+lora_weights: null  # resources/hps_lora/adapted_model.bin

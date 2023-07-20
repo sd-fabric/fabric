@@ -1,6 +1,6 @@
 # FABRIC: Personalizing Diffusion Models with Iterative Feedback
 
-[Paper (coming soon)]() |
+[Paper](https://arxiv.org/abs/2307.10159) |
 [Website](https://sd-fabric.github.io/) |
 [Colab](https://colab.research.google.com/drive/1rWZ4jQHMvjc-l7xYAssa_OUOaAx3XDQT?usp=sharing) |
 [Gradio](https://colab.research.google.com/drive/12pFi6WAKASG18uH3UcxGMVI37e1pIwAz)

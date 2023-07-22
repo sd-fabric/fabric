@@ -8,6 +8,8 @@
 FABRIC (Feedback via Attention-Based Reference Image Conditioning) is a technique to incorporate iterative feedback into the generative process of diffusion models based on StableDiffusion.
 This is done by exploiting the self-attention mechanism in the U-Net in order to condition the diffusion process on a set of positive and negative reference images that are to be chosen based on human feedback.
 
+🚨 FABRIC plugin for SD WebUI (alpha version): https://github.com/dvruette/sd-webui-fabric
+
 
 ## Setup
 

@@ -73,3 +73,15 @@ python fabric/evaluation/preference_model_feedback.py
 # Experiment 2: Target image-based feedback selection
 python fabric/evaluation/target_image_feedback.py
 ```
+
+## Citation
+```
+@misc{vonrutte2023fabric,
+      title={FABRIC: Personalizing Diffusion Models with Iterative Feedback}, 
+      author={Dimitri von Rütte and Elisabetta Fedele and Jonathan Thomm and Lukas Wolf},
+      year={2023},
+      eprint={2307.10159},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```

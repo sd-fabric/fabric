@@ -76,6 +76,11 @@ python fabric/evaluation/preference_model_feedback.py
 python fabric/evaluation/target_image_feedback.py
 ```
 
+To evaluate using the HPS LoRA, download it from [the official repository](https://github.com/tgxs002/align_sd#adapted-model) (e.g. to `resources/hps_lora/adapted_model.bin`) and pass it to the evaluation scripts as follows:
+```bash
+python fabric/evaluation/target_image_feedback.py lora_weights="resources/hps_lora/adapted_model.bin"
+```
+
 ## Citation
 ```
 @misc{vonrutte2023fabric,

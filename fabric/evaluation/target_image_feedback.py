@@ -62,6 +62,10 @@ def main(ctx: DictConfig):
     
     prompts, images = get_prompt_image_pairs(to_absolute_path(ctx.prompthero_path))
     print(f"Found {len(prompts)} prompts and {len(images)} images")
+    if hasattr(ctx, "num_prompts") and ctx.num_prompts and ctx.num_prompts > 0:
+        prompts = prompts[:ctx.num_prompts]
+        images = images[:ctx.num_prompts]
+    print(f"Using {len(prompts)} prompts")
     
     img_similarity_model = ImageSimilarity(device=device)
     img_diversity_model = ImageDiversity(device=device)

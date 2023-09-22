@@ -20,8 +20,8 @@ use_neg_feedback: yes
 feedback:
   start: 0.0
   end: 0.8
-  min_weight: 0.1
-  max_weight: 0.8
+  min_weight: 0.0
+  max_weight: 0.3
   neg_scale: 0.5
 global_seed: 0
 image_seed: null

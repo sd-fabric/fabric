@@ -77,7 +77,8 @@ def generate_rounds_with_automatic_feedback(
         feedback_scores = feedback_fn(imgs)
         round_diversity = img_diversity_model.compute(imgs)
 
-        liked, disliked = params["liked"], params["disliked"]
+        liked = [Image.open(p) for p in liked_paths]
+        disliked = [Image.open(p) for p in disliked_paths]
         if len(liked) > 0:
             pos_sims = img_similarity_model.compute(imgs, liked)
             pos_sims = np.mean(pos_sims, axis=1)

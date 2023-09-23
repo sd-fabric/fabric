@@ -33,6 +33,7 @@ def main(ctx: DictConfig):
 
     device = "cpu"  # "mps" if torch.backends.mps.is_available() else "cpu"
     device = get_free_gpu() if torch.cuda.is_available() else device
+    device = "cuda"
     print(f"Using device: {device}")
 
     dtype = torch.float16 if torch.cuda.is_available() else torch.float32

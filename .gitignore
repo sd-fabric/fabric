@@ -9,6 +9,7 @@ weights
 
 # Generated images and logs
 outputs
+multirun
 
 # LoRA files
 resources/hps_lora/*

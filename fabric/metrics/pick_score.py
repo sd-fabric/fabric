@@ -73,6 +73,6 @@ class PickScore:
         text_embs = text_embs / torch.norm(text_embs, dim=-1, keepdim=True)
 
         # score
-        scores = 100 * self.model.logit_scale.exp() * (text_embs @ image_embs.T)[0]
+        scores = self.model.logit_scale.exp() * (text_embs @ image_embs.T)[0]
 
         return scores.cpu().tolist()

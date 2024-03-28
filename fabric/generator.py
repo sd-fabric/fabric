@@ -14,6 +14,13 @@ from diffusers import (
 from diffusers.models.attention import BasicTransformerBlock
 from diffusers.models.cross_attention import LoRACrossAttnProcessor
 
+try:
+    import xformers
+    has_xformers = True
+except ImportError:
+    print("WARNING: xformers is not installed. Please install it using `pip install xformers`")
+    has_xformers = False
+
 
 def apply_unet_lora_weights(pipeline, unet_path):
     model_weight = torch.load(unet_path, map_location="cpu")
@@ -88,19 +95,32 @@ def attn_with_weights(
         key = attn.to_k(encoder_hidden_states)
         value = attn.to_v(encoder_hidden_states)
 
-    query = attn.head_to_batch_dim(query)
-    key = attn.head_to_batch_dim(key)
-    value = attn.head_to_batch_dim(value)
+    query = attn.head_to_batch_dim(query).contiguous()
+    key = attn.head_to_batch_dim(key).contiguous()
+    value = attn.head_to_batch_dim(value).contiguous()
 
-    attention_probs = attn.get_attention_scores(query, key, attention_mask)
+    if not has_xformers:
+        attention_probs = attn.get_attention_scores(query, key, attention_mask)
+        if weights is not None:
+            if weights.shape[0] != 1:
+                weights = weights.repeat_interleave(attn.heads, dim=0)
+            attention_probs = attention_probs * weights[:, None]
+            attention_probs = attention_probs / attention_probs.sum(dim=-1, keepdim=True)
+        hidden_states = torch.bmm(attention_probs, value)
+    else:
+        if weights is not None:
+            bias = weights.repeat_interleave(attn.heads, dim=0).unsqueeze(1).expand(-1, query.size(1), -1).log()
+            if attention_mask is None:
+                attention_mask = bias
+            else:
+                attention_mask += bias
 
-    if weights is not None:
-        if weights.shape[0] != 1:
-            weights = weights.repeat_interleave(attn.heads, dim=0)
-        attention_probs = attention_probs * weights[:, None]
-        attention_probs = attention_probs / attention_probs.sum(dim=-1, keepdim=True)
+        hidden_states = xformers.ops.memory_efficient_attention(
+            query, key, value, attn_bias=attention_mask, op=None, scale=attn.scale
+        )
+        hidden_states = hidden_states.to(query.dtype)
 
-    hidden_states = torch.bmm(attention_probs, value)
+
     hidden_states = attn.batch_to_head_dim(hidden_states)
 
     # linear proj

@@ -311,6 +311,7 @@ class AttentionBasedGenerator(nn.Module):
 
                 do_fabric = do_cfg and z_ref.size(0) > 0 and weight > 0
                 if do_fabric:
+                    batch = z_all.size(0)
                     noise = torch.randn_like(z_ref)
                     z_ref_noised = (alpha_hat ** 0.5 * z_ref + (1 - alpha_hat) ** 0.5 * noise)
 
@@ -318,7 +319,6 @@ class AttentionBasedGenerator(nn.Module):
 
                     z_all = torch.cat([z_all, z_ref_noised], dim=0)
                     prompt_embd = torch.cat([prompt_embd, ref_prompt_embd], dim=0)
-                    batch = z_all.size(0)
                 else:
                     batch = None
 

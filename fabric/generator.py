@@ -62,7 +62,6 @@ def attn_with_weights(attn: nn.Module, hidden_states, encoder_hidden_states=None
         key = attn.to_k(encoder_hidden_states)
         value = attn.to_v(encoder_hidden_states)
 
-
     if batch is None:
         query = attn.head_to_batch_dim(query).contiguous()
         key = attn.head_to_batch_dim(key).contiguous()
@@ -90,8 +89,9 @@ def attn_with_weights(attn: nn.Module, hidden_states, encoder_hidden_states=None
             else:
                 attention_mask += bias
 
-        ref_q, ref_k, ref_v, q_pos, k, v, q_neg, k_neg, v_neg = [attn.head_to_batch_dim(x).contiguous()
-                                                                 for x in [ref_q, ref_k, ref_v, q_pos, k, v, q_neg, k_neg, v_neg]]
+        ref_q, ref_k, ref_v, q_pos, k, v, q_neg, k_neg, v_neg = [attn.head_to_batch_dim(x).contiguous() for x in
+                                                                 [ref_q, ref_k, ref_v, q_pos, k, v, q_neg, k_neg,
+                                                                  v_neg]]
         ref_hidden_states = xformers.ops.memory_efficient_attention(ref_q, ref_k, ref_v, op=None, scale=attn.scale)
         pos_hidden_states = xformers.ops.memory_efficient_attention(q_pos, k, v, attn_bias=attention_mask, op=None,
                                                                     scale=attn.scale)
@@ -235,7 +235,8 @@ class AttentionBasedGenerator(nn.Module):
                  disliked: List[Image.Image] = [], seed: int = 42, n_images: int = 1, guidance_scale: float = 8.0,
                  denoising_steps: int = 20, feedback_start: float = 0.33, feedback_end: float = 0.66,
                  min_weight: float = 0.1, max_weight: float = 1.0, neg_scale: float = 0.5,
-                 pos_bottleneck_scale: float = 1.0, neg_bottleneck_scale: float = 1.0, size: int = 2048):
+                 pos_bottleneck_scale: float = 1.0, neg_bottleneck_scale: float = 1.0, size: int = 2048,
+                 warmup_power: float = 1):
         """
         Generate a trajectory of images with binary feedback.
         The feedback can be given as a list of liked and disliked images.
@@ -298,7 +299,8 @@ class AttentionBasedGenerator(nn.Module):
                 if do_cfg:
                     z_all = torch.cat([z_single] * 2, dim=0)
                     z_ref = torch.cat([pos_latents, neg_latents], dim=0)
-                    weight = (max_weight - min_weight) * (ref_end_idx - i) / (ref_end_idx - ref_start_idx) + min_weight
+                    scale = (ref_end_idx - i) / (ref_end_idx - ref_start_idx)
+                    weight = (max_weight - min_weight) * scale ** warmup_power + min_weight
                     prompt_embd = batched_prompt_embd
                     pos_ws = (weight, weight * pos_bottleneck_scale)
                     neg_ws = (weight * neg_scale, weight * neg_scale * neg_bottleneck_scale)

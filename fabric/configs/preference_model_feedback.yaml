@@ -5,6 +5,7 @@ hydra:
   job:
     chdir: true
 
+size: 512
 model_version: "1.5"
 model_name: dreamlike-art/dreamlike-photoreal-2.0
 negative_prompt: lowres, bad anatomy, bad hands, cropped, worst quality
@@ -23,6 +24,7 @@ feedback:
   min_weight: 0.0
   max_weight: 0.3
   neg_scale: 0.5
+  warmup_power: 1
 global_seed: 0
 image_seed: null
 liked_images: []

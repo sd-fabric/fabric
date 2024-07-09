@@ -15,4 +15,6 @@ feedback:
   min_weight: 0.05
   max_weight: 0.9
   neg_scale: 0.5
+  warmup_power: 1
 topk: 4
+size: 512

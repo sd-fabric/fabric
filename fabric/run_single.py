@@ -30,7 +30,8 @@ def main(ctx: DictConfig):
     imgs = generator.generate(prompt=ctx.prompt, negative_prompt=ctx.negative_prompt, liked=liked, disliked=[],
         seed=ctx.seed, n_images=ctx.n_images, guidance_scale=ctx.guidance_scale, denoising_steps=ctx.denoising_steps,
         feedback_start=ctx.feedback.start, feedback_end=ctx.feedback.end, min_weight=ctx.feedback.min_weight,
-        max_weight=ctx.feedback.max_weight, neg_scale=ctx.feedback.neg_scale, size=3072)
+        max_weight=ctx.feedback.max_weight, neg_scale=ctx.feedback.neg_scale, size=ctx.size,
+                              warmup_power=ctx.feedback.warmup_power)
 
     date_str = date.today().strftime("%Y-%m-%d")
     out_folder = os.path.join("outputs", "images", date_str)

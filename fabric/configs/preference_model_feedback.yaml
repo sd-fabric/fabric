@@ -31,3 +31,4 @@ output_path: images
 
 # For loading the Human Preference Score LoRA weights, set null to not use them
 lora_weights: null  # resources/hps_lora/adapted_model.bin
+topk: 0

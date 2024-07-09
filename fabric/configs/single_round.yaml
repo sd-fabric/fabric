@@ -1,17 +1,18 @@
 model_version: "1.5"
 model_ckpt: null
 model_name: dreamlike-art/dreamlike-photoreal-2.0
-prompt: photo of a dog running on grassland, masterpiece, best quality, fine details
+prompt: A robot holding a sign that says "The future is now", masterpiece, best quality
 negative_prompt: lowres, bad anatomy, bad hands, cropped, worst quality
 liked: []
 disliked: []
-n_images: 4
-denoising_steps: 20
-guidance_scale: 7
+n_images: 1
+denoising_steps: 100
+guidance_scale: 6
 seed: 37
 feedback:
-  start: 0.33
-  end: 0.66
+  start: 0.0
+  end: 0.8
   min_weight: 0.05
-  max_weight: 0.8
+  max_weight: 0.9
   neg_scale: 0.5
+topk: 4

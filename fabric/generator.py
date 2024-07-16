@@ -317,7 +317,7 @@ class AttentionBasedGenerator(nn.Module):
                     noise = torch.randn_like(z_ref)
                     z_ref_noised = (alpha_hat ** 0.5 * z_ref + (1 - alpha_hat) ** 0.5 * noise)
 
-                    ref_prompt_embd = torch.cat([null_prompt_emb] * (pos_latents.size(0) + neg_latents.size(0)), dim=0)
+                    ref_prompt_embd = torch.cat([cond_prompt_embs] * (pos_latents.size(0) + neg_latents.size(0)), dim=0)
 
                     z_all = torch.cat([z_all, z_ref_noised], dim=0)
                     prompt_embd = torch.cat([prompt_embd, ref_prompt_embd], dim=0)

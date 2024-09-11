@@ -152,7 +152,7 @@ class AttentionBasedGenerator(nn.Module):
 
         if model_name is None:
             if stable_diffusion_version == "1.5":
-                model_name = "runwayml/stable-diffusion-v1-5"
+                model_name = "jcplus/stable-diffusion-v1-5"
             elif stable_diffusion_version == "2.1":
                 model_name = "stabilityai/stable-diffusion-2-1"
             else:

@@ -5,13 +5,14 @@ hydra:
   job:
     chdir: true
 
+size: 512
 model_version: "1.5"
 model_name: dreamlike-art/dreamlike-photoreal-2.0  # runwayml/stable-diffusion-v1-5
 negative_prompt: lowres, bad anatomy, bad hands, cropped, worst quality
 n_images: 4
 n_rounds: 3
 num_prompts: 1000
-denoising_steps: 20
+denoising_steps: 10
 guidance_scale: 6
 prompt_dropout: 0.0
 use_pos_feedback: yes
@@ -22,6 +23,7 @@ feedback:
   min_weight: 0.0
   max_weight: 0.3
   neg_scale: 0.5
+  warmup_power: 1
 global_seed: 0
 image_seed: null
 liked_images: []
@@ -31,3 +33,4 @@ output_path: images
 
 # For loading the Human Preference Score LoRA weights, set null to not use them
 lora_weights: null  # resources/hps_lora/adapted_model.bin
+topk: 0
